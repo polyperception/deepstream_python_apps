@@ -592,10 +592,10 @@ namespace pydsdoc
             :arg source_id: source id for which this event needs to be generated
             :returns: True for success.)pyds";
         
-        constexpr const char* alloc_custom_struct=R"pyds( 
-            Allocate an :class:`CustomDataStruct`. 
+        constexpr const char* alloc_embedding_struct=R"pyds( 
+            Allocate an :class:`EmbeddingMetadata`. 
 
-            :returns: Allocated :class:`CustomDataStruct`)pyds";
+            :returns: Allocated :class:`EmbeddingMetadata`)pyds";
 
         constexpr const char* configure_source_for_ntp_sync=R"pyds(
             Configure the source to generate NTP sync values for RTSP sources.

@@ -27,7 +27,7 @@
 #include "bindopticalflow.hpp"
 #include "bindschema.hpp"
 #include "bindtrackermeta.hpp"
-#include "custom_binding/include/bindcustom.hpp"
+#include "bind_embed_metadata.hpp"
 
 #include "pyds.hpp"
 
@@ -63,7 +63,7 @@ namespace pydeepstream {
         bindnvbufsurface(m);
         bindnvdsinfer(m);
         bindopticalflowmeta(m);
-        bindcustom(m);
+        bindembedding(m);
 
     }   // end PYBIND11_MODULE(pyds, m)
 }

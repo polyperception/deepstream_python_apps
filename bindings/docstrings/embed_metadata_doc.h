@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ * SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <string>
 
-using namespace std;
+#pragma once
 
-struct CustomDataStruct {
-  int structId;
-  char* message;
-  int sampleInt;
-};
+namespace pydsdoc
+{
+    namespace embedding
+    {
+        namespace EmbeddingMetadataDoc
+        {
+            constexpr const char* descr = R"pyds(
+                Holds embeddings for each detected objects after pgie.
+
+                :ivar embedding: *vector<int>*, embeddings)pyds";
+
+            constexpr const char* cast=R"pyds(cast given object/data to :class:`EmbeddingMetadata`, call pyds.EmbeddingMetadata.cast(data))pyds";
+        }
+    }
+}
