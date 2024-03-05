@@ -67,13 +67,14 @@ include_directories(
         /usr/include/glib-2.0
         /usr/lib/aarch64-linux-gnu/glib-2.0/include/
         /usr/lib/x86_64-linux-gnu/glib-2.0/include
+        /usr/app/gst-plugins/gst-p12n/plugins/metadata
         )
 
 add_library(pyds SHARED src/pyds.cpp src/utils.cpp src/bindanalyticsmeta.cpp
             src/bindfunctions.cpp src/bindgstnvdsmeta.cpp
             src/bindmeta360.cpp src/bindnvbufsurface.cpp src/bindnvdsinfer.cpp
             src/bindnvdsmeta.cpp src/bindnvosd.cpp src/bindopticalflow.cpp
-            src/bindschema.cpp src/bindtrackermeta.cpp  src/bind_embed_metadata.cpp)
+            src/bindschema.cpp src/bindtrackermeta.cpp   src/bind_reidembed_metadata.cpp)
 
 set_target_properties(pyds PROPERTIES PREFIX "")
 set_target_properties(pyds PROPERTIES OUTPUT_NAME "pyds")

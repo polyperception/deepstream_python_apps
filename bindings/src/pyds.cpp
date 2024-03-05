@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION &
+ * AFFILIATES. All rights reserved. SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-
+#include "bind_reidembed_metadata.hpp"
 #include "bindanalyticsmeta.hpp"
 #include "bindfunctions.hpp"
 #include "bindgstnvdsmeta.hpp"
@@ -27,7 +27,6 @@
 #include "bindopticalflow.hpp"
 #include "bindschema.hpp"
 #include "bindtrackermeta.hpp"
-#include "bind_embed_metadata.hpp"
 
 #include "pyds.hpp"
 
@@ -40,32 +39,33 @@
 using namespace std;
 namespace py = pybind11;
 
-namespace pydeepstream {
+namespace pydeepstream
+{
 
-    PYBIND11_MODULE(pyds, m) {
-        m.doc() = "pybind11 bindings for gstnvdsmeta"; /* this will be the doc string*/
-        m.attr("__version__") = PYDS_VERSION;
+PYBIND11_MODULE (pyds, m)
+{
+  m.doc ()
+      = "pybind11 bindings for gstnvdsmeta"; /* this will be the doc string*/
+  m.attr ("__version__") = PYDS_VERSION;
 
-        py::class_<GList>(m, "GList")
-                .def(py::init<>())
-                .def_readwrite("data", &GList::data)
-                .def_readwrite("next", &GList::next)
-                .def_readwrite("prev", &GList::prev);
+  py::class_<GList> (m, "GList")
+      .def (py::init<> ())
+      .def_readwrite ("data", &GList::data)
+      .def_readwrite ("next", &GList::next)
+      .def_readwrite ("prev", &GList::prev);
 
-        bindnvosd(m);
-        bindnvdsmeta(m);
-        bindschema(m);
-        bindfunctions(m);
-        bindtrackermeta(m);
-        bindmeta360(m);
-        bindanalyticsmeta(m);
-        bindgstnvdsmeta(m);
-        bindnvbufsurface(m);
-        bindnvdsinfer(m);
-        bindopticalflowmeta(m);
-        bindembedding(m);
+  bindnvosd (m);
+  bindnvdsmeta (m);
+  bindschema (m);
+  bindfunctions (m);
+  bindtrackermeta (m);
+  bindmeta360 (m);
+  bindanalyticsmeta (m);
+  bindgstnvdsmeta (m);
+  bindnvbufsurface (m);
+  bindnvdsinfer (m);
+  bindopticalflowmeta (m);
+  bindreidembedding (m);
 
-    }   // end PYBIND11_MODULE(pyds, m)
+} // end PYBIND11_MODULE(pyds, m)
 }
-
-

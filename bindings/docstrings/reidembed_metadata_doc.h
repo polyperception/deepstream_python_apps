@@ -19,16 +19,16 @@
 
 namespace pydsdoc
 {
-namespace embedding
+namespace reidembedding
 {
-namespace EmbeddingMetadata
+namespace ReIDEmbeddingMetadata
 {
             constexpr const char* descr = R"pyds(
-                Holds embeddings for each detected objects after pgie.
+                Holds Re-ID embeddings for each detected objects after the dedicated sgie.
 
                 :ivar embedding: *vector<int>*, embeddings)pyds";
 
-            constexpr const char* cast=R"pyds(cast given object/data to :class:`EmbeddingMetadata`, call pyds.EmbeddingMetadata.cast(data))pyds";
+            constexpr const char* cast=R"pyds(cast given object/data to :class:`ReIDEmbeddingMetadata`, call pyds.ReIDEmbeddingMetadata.cast(data))pyds";
             }
             }
             }

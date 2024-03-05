@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &
+ * AFFILIATES. All rights reserved. SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 
 namespace pydsdoc
 {
-    namespace methodsDoc
-	{
+namespace methodsDoc
+{
         constexpr const char* get_segmentation_masks=R"pyds(
             This function returns the inferred masks in Numpy format in the height X width shape, these height and width are obtained from the :class:`NvDsInferSegmentationMeta`.
 
@@ -40,9 +40,9 @@ namespace pydsdoc
 
             :arg gst_buffer: address of the Gstbuffer which contains `NvBufSurface`
             :arg batchID: batch_id of the frame to be processed. This indicates the frame's index within :class:`NvBufSurface`
-            
+
             :returns: NumPy array containing the frame image buffer.)pyds";
-        
+
         constexpr const char* get_nvds_buf_surface_gpu=R"pyds(
             This function returns the dtype, shape of the array, strides, pointer to the GPU buffer, and size of the allocated memory for the buffer. Only x86 and RGBA format is supported. This information can be used to create a CuPy array (see deepstream-imagedata-multistream-cupy).
             Changes to the frame image will be preserved and seen in downstream elements, with the following restrictions.
@@ -51,7 +51,7 @@ namespace pydsdoc
 
             :arg gst_buffer: address of the Gstbuffer which contains `NvBufSurface`
             :arg batchID: batch_id of the frame to be processed. This indicates the frame's index within :class:`NvBufSurface`
-            
+
             :returns: dtype, shape, strides, pointer to buffer, size of allocated memory of the GPU buffer)pyds";
 
         constexpr const char* unmap_nvds_buf_surface=R"pyds(
@@ -114,7 +114,7 @@ namespace pydsdoc
 
             :arg frame_meta: An object of type :class:`NvDsFrameMeta` to which obj_meta will be attached.
             :arg obj_meta: An object of type :class:`NvDsObjectMeta` acquired from obj_meta_pool present in :class:`NvDsBatchMeta`.
-            :arg obj_parent: A parent object of type :class:`NvDsObjectMeta`. This will set the parent object's to obj_meta.)pyds";  
+            :arg obj_parent: A parent object of type :class:`NvDsObjectMeta`. This will set the parent object's to obj_meta.)pyds";
 
         constexpr const char* nvds_remove_obj_meta_from_frame=R"pyds(
             Removes given object meta from the frame metadata.
@@ -207,7 +207,7 @@ namespace pydsdoc
 
             :arg batch_meta: An object of type :class:`NvDsBatchMeta` from which user_meta is to be removed.
             :arg user_meta: An object of type :class:`NvDsUserMeta` to be removed from batch_meta.
-        
+
             :returns: Acquired :class:`NvDsUserMeta` object from user meta pool)pyds";
 
         constexpr const char* nvds_remove_user_meta_from_frame=R"pyds(
@@ -231,7 +231,7 @@ namespace pydsdoc
             Copy function to copy batch_meta. It is called when meta_data needs to copied / transformed from one buffer to other.
             meta_data and user_data are passed as arguments.
 
-            :arg data: An object of type :class:`NvDsBatchMeta` 
+            :arg data: An object of type :class:`NvDsBatchMeta`
             :arg user_data: An object of user specific data
 
             :returns: An object that can be typecasted tot :class:`NvDsBatchMeta`)pyds";
@@ -239,7 +239,7 @@ namespace pydsdoc
         constexpr const char* nvds_batch_meta_release_func=R"pyds(
             batch_meta release function called when meta_data is going to be released.
 
-            :arg data: An object of type :class:`NvDsBatchMeta` 
+            :arg data: An object of type :class:`NvDsBatchMeta`
             :arg user_data: An object of user specific data)pyds";
 
         constexpr const char* nvds_get_nth_frame_meta=R"pyds(
@@ -261,7 +261,7 @@ namespace pydsdoc
 
             :arg frame_meta: An object of type :class:`NvDsFrameMeta` from which :class:`NvDsObjectMetaList` needs to be cleared
             :arg meta_list: An object of type :class:`NvDsObjectMetaList` which needs to be cleared)pyds";
-    
+
         constexpr const char* nvds_clear_display_meta_list=R"pyds(
             Removes all the display metadata present in the frame metadata.
 
@@ -303,32 +303,32 @@ namespace pydsdoc
 
         constexpr const char* nvds_copy_frame_user_meta_list=R"pyds(
             Deep copy of src_user_meta_list to user meta list present in the dst_frame_meta.
-        
+
             :arg src_user_meta_list: An object of type :class:`NvDsUserMetaList`
             :arg dst_frame_meta: An object of type :class:`NvDsFrameMeta`)pyds";
 
         constexpr const char* nvds_copy_display_meta_list=R"pyds(
             Deep copy of src_display_meta_list to display meta list present in the dst_frame_meta.
-        
+
             :arg src_display_meta_list: An object of type :class:`NvDisplayMetaList`
             :arg dst_frame_meta: An object of type :class:`NvDsFrameMeta`)pyds";
 
         constexpr const char* nvds_copy_frame_meta_list=R"pyds(
             Deep copy of src_frame_meta_list to frame meta list present in the dst_batch_meta.
-        
+
             :arg src_frame_meta_list: An object of type :class:`NvDsFrameMetaList`
             :arg dst_batch_meta: An object of type :class:`NvDsBatchMeta`)pyds";
 
         constexpr const char* nvds_copy_obj_meta_list=R"pyds(
             Deep copy of src_obj_meta_list to frame meta list present in the dst_frame_meta.
-        
+
             :arg src_obj_meta_list: An object of type :class:`NvDsObjectMetaList`
             :arg dst_frame_meta: An object of type :class:`NvDsFrameMeta`)pyds";
 
         constexpr const char* nvds_get_user_meta_type1=R"pyds(
             Generates a unique user metadata type from the given string describing user specific metadata.
-        
-            :arg meta_descriptor: A string object describing metadata. 
+
+            :arg meta_descriptor: A string object describing metadata.
             The format of the string should be specified as below:
                 ORG_NAME.COMPONENT_NAME.METADATA_DESCRIPTION.
 
@@ -349,7 +349,7 @@ namespace pydsdoc
 
                 e.g. (NVIDIA.NVINFER.TENSOR_METADATA))pyds";
 
-        constexpr const char* gst_buffer_add_nvds_meta=R"pyds( 
+        constexpr const char* gst_buffer_add_nvds_meta=R"pyds(
             Adds GstMeta of type :class:`NvDsMeta` to the GstBuffer and sets the `meta_data` member of :class:`NvDsMeta`.
 
             :arg buffer: GstBuffer to which the function adds metadata.
@@ -359,7 +359,7 @@ namespace pydsdoc
 
             :returns: An object to the attached :class:`NvDsMeta` object; or NONE in case failure)pyds";
 
-        constexpr const char* gst_buffer_get_nvds_batch_meta=R"pyds( 
+        constexpr const char* gst_buffer_get_nvds_batch_meta=R"pyds(
             Gets the :class:`NvDsBatchMeta` added to the GstBuffer.
 
             :arg buffer: GstBuffer from which to retrieve the :class:`NvDsBatchMeta`
@@ -369,216 +369,216 @@ namespace pydsdoc
             For example:
             ``batch_meta = pyds.gst_buffer_get_nvds_batch_meta(hash(gst_buffer))``)pyds";
 
-        constexpr const char* user_copyfunc=R"pyds( 
+        constexpr const char* user_copyfunc=R"pyds(
             Set copy callback function of given :class:`NvDsUserMeta` object.
 
             :arg meta: :class:`NvDsUserMeta` of which to set copy function
             :arg func: User-written copy function)pyds";
 
-        constexpr const char* user_releasefunc=R"pyds( 
+        constexpr const char* user_releasefunc=R"pyds(
             Set release callback function of given :class:`NvDsUserMeta` object.
 
             :arg meta: :class:`NvDsUserMeta` of which to set release function
             :arg func: User-written release function)pyds";
 
-        constexpr const char* alloc_buffer=R"pyds( 
-            Allocate buffer of given size. 
+        constexpr const char* alloc_buffer=R"pyds(
+            Allocate buffer of given size.
 
             :arg size: Size of memory to be allocated
 
             :returns: C address of allocated buffer)pyds";
 
-        constexpr const char* free_buffer=R"pyds( 
+        constexpr const char* free_buffer=R"pyds(
             Frees memory of given buffer.
 
             :arg buffer: C address of the buffer to be freed)pyds";
 
-        constexpr const char* free_gbuffer=R"pyds( 
+        constexpr const char* free_gbuffer=R"pyds(
             Frees memory of given gbuffer.
 
             :arg buffer: gpointer to the buffer to be freed)pyds";
 
-        constexpr const char* get_string=R"pyds( 
-            Cast given pointer to string. 
+        constexpr const char* get_string=R"pyds(
+            Cast given pointer to string.
 
             :arg ptr: C address of the string
 
             :returns: Reference to the string object)pyds";
 
-        constexpr const char* get_ptr=R"pyds( 
+        constexpr const char* get_ptr=R"pyds(
             Gets the C address of given object.
 
             :arg ptr: Object of which to retrieve C address "pointer"
 
             :returns: C address of given data)pyds";
 
-        constexpr const char* memdup=R"pyds( 
-            Allocate memory and duplicate given object into it. 
+        constexpr const char* memdup=R"pyds(
+            Allocate memory and duplicate given object into it.
 
             :arg ptr: C address of object to duplicate. See :py:func:`get_ptr`
             :arg size: Size of object to duplicate
 
             :returns: C address of allocated duplicate)pyds";
 
-        constexpr const char* alloc_nvds_vehicle_object=R"pyds( 
-            Allocate an :class:`NvDsVehicleObject`. 
+        constexpr const char* alloc_nvds_vehicle_object=R"pyds(
+            Allocate an :class:`NvDsVehicleObject`.
 
             :returns: Allocated :class:`NvDsVehicleObject`)pyds";
 
-        constexpr const char* alloc_nvds_person_object=R"pyds( 
-            Allocate an :class:`NvDsPersonObject`. 
+        constexpr const char* alloc_nvds_person_object=R"pyds(
+            Allocate an :class:`NvDsPersonObject`.
 
             :returns: Allocated :class:`NvDsPersonObject`)pyds";
 
-        constexpr const char* alloc_nvds_face_object=R"pyds( 
-            Allocate an :class:`NvDsFaceObject`. 
+        constexpr const char* alloc_nvds_face_object=R"pyds(
+            Allocate an :class:`NvDsFaceObject`.
 
             :returns: Allocated :class:`NvDsFaceObject`)pyds";
 
-        constexpr const char* alloc_nvds_event_msg_meta=R"pyds( 
-            Allocate an :class:`NvDsEventMsgMeta`. 
+        constexpr const char* alloc_nvds_event_msg_meta=R"pyds(
+            Allocate an :class:`NvDsEventMsgMeta`.
 
             :returns: Allocated :class:`NvDsEventMsgMeta`)pyds";
 
-        constexpr const char* alloc_nvds_event=R"pyds( 
-            Allocate an :class:`NvDsEvent`. 
+        constexpr const char* alloc_nvds_event=R"pyds(
+            Allocate an :class:`NvDsEvent`.
 
             :returns: Allocated :class:`NvDsEvent`)pyds";
 
-        constexpr const char* generate_ts_rfc3339=R"pyds( 
+        constexpr const char* generate_ts_rfc3339=R"pyds(
             Generate RFC3339 timestamp.
 
             :arg buffer: Buffer into which timestamp content is copied
             :arg size: Maximum timestamp length)pyds";
 
-        constexpr const char* alloc_nvds_payload=R"pyds( 
-            Allocate an :class:`NvDsPayload`. 
+        constexpr const char* alloc_nvds_payload=R"pyds(
+            Allocate an :class:`NvDsPayload`.
 
             :returns: Allocated :class:`NvDsPayload`)pyds";
 
         constexpr const char* NvBufSurfaceCreate=R"pyds(
             Allocate batch of buffers.
-            
+
             Allocates memory for batchSize buffers and returns in surf object allocated :class:`NvBufSurface`.
             params object should have allocation parameters of single object. If size field in
             params is set, buffer of that size will be allocated and all other
             parameters (w, h, color format etc.) will be ignored.
-            
+
             Use :py:func:`NvBufSurfaceDestroy` to free all the resources.
-            
+
             :arg surf: pointer to allocated batched buffers.
             :arg batchSize: batch size of buffers.
             :arg params: pointer to :class:`NvBufSurfaceCreateParams` structure.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceDestroy=R"pyds(
             Free the batched buffers previously allocated through NvBufSurfaceCreate.
-            
+
             :arg surf: An object to :class:`NvBufSurface` to free.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceMap=R"pyds(
             Map HW batched buffers to HOST CPU address space.
-            
+
             Valid for NVBUF_MEM_CUDA_UNIFIED type of memory for dGPU and NVBUF_MEM_SURFACE_ARRAY and NVBUF_MEM_HANDLE type of memory for Jetson.
-            
+
             This function will fill addr array of :class:`NvBufSurfaceMappedAddr` field of :class:`NvBufSurfaceParams` with the CPU mapped memory pointers.
-            
+
             The client must call :py:func:`NvBufSurfaceSyncForCpu` with the virtual address populated by this function before accessing the mapped memory in CPU.
-            
+
             After memory mapping is complete, mapped memory modification must be coordinated between the CPU and hardware device as follows:
                 - CPU: If the CPU modifies any mapped memory, the client must call :py:func:`NvBufSurfaceSyncForDevice` before any hardware device accesses the memory.
                 - Hardware device: If the mapped memory is modified by any hardware device, the client must call :py:func:`NvBufSurfaceSyncForCpu` before CPU accesses the memory.
-            
+
             Use :py:func:`NvBufSurfaceUnMap` to unmap buffer(s) and release any resource.
-            
+
             :arg surf: pointer to :class:`NvBufSurface` structure.
             :arg index: index of buffer in the batch. -1 for all buffers in batch.
             :arg plane: index of plane in buffer. -1 for all planes in buffer.
             :arg type: flag for mapping type.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceUnMap=R"pyds(
             Unmap the previously mapped buffer(s).
-            
+
             :arg surf: pointer to :class:`NvBufSurface` structure.
             :arg index: index of buffer in the batch. -1 for all buffers in batch.
             :arg plane: index of plane in buffer. -1 for all planes in buffer.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceCopy=R"pyds(
             Copy the memory content of source batched buffer(s) to memory of destination batched buffer(s).
-            
+
             This function can be used to copy source buffer(s) of one memory type
             to destination buffer(s) of different memory type.
             e.g. CUDA Host to CUDA Device or malloced memory to CUDA device etc.
-            
+
             Both source and destination :class:`NvBufSurface` must have same buffer and batch size.
-            
+
             :arg srcSurf: pointer to source :class:`NvBufSurface` structure.
             :arg dstSurf: pointer to destination :class:`NvBufSurface`  structure.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceSyncForCpu=R"pyds(
             Syncs the HW memory cache for the CPU.
-            
+
             Valid only for NVBUF_MEM_SURFACE_ARRAY and NVBUF_MEM_HANDLE memory types.
-            
+
             :arg surf: pointer to :class:`NvBufSurface` structure.
             :arg index: index of buffer in the batch. -1 for all buffers in batch.
             :arg plane: index of plane in buffer. -1 for all planes in buffer.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceSyncForDevice=R"pyds(
             Syncs the HW memory cache for the device.
-            
+
             Valid only for NVBUF_MEM_SURFACE_ARRAY and NVBUF_MEM_HANDLE memory types.
-            
+
             :arg surf: pointer to :class:`NvBufSurface` structure.
             :arg index: index of buffer in the batch. -1 for all buffers in batch.
             :arg plane: index of plane in buffer. -1 for all planes in buffer.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceFromFd=R"pyds(
             Get the :class:`NvBufSurface` from the dmabuf fd.
-            
+
             :arg dmabuf_fd: dmabuf fd of the buffer.
             :arg buffer: pointer to :class:`NvBufSurface` .
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceMemSet=R"pyds(
             Fill each byte of buffer(s) in :class:`NvBufSurface` with provided value.
-            
+
             This function can also be used to reset the buffer(s) in the batch.
-            
+
             :arg surf: pointer to :class:`NvBufSurface` structure.
             :arg index: index of buffer in the batch. -1 for all buffers in batch.
             :arg plane: index of plane in buffer. -1 for all planes in buffer.
             :arg value: value to be set.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* NvBufSurfaceMapEglImage=R"pyds(
             Creates an EGLImage from memory of :class:`NvBufSurface` buffer(s).
-            
+
             Only memory type NVBUF_MEM_SURFACE_ARRAY is supported.
             This function will set eglImage pointer of :class:`NvBufSurfaceMappedAddr` field of :class:`NvBufSurfaceParams` with EGLImageKHR.
-            
+
             This function can be used in scenarios where CUDA operation on Jetson HW
             memory (NVBUF_MEM_SURFACE_ARRAY) is required. EGLImageKHR provided by this
             function can then be register with CUDA for further CUDA operations.
-            
+
             :arg surf: pointer to NvBufSurface structure.
             :arg index: index of buffer in the batch. -1 for all buffers in batch.
-            
+
             :returns: 0 for success, -1 for failure.)pyds";
 
         constexpr const char* gst_element_send_nvevent_new_stream_reset=R"pyds(
@@ -591,11 +591,16 @@ namespace pydsdoc
             :arg gst_element: element for to which the generated event needs to be sent.
             :arg source_id: source id for which this event needs to be generated
             :returns: True for success.)pyds";
-        
-        constexpr const char* alloc_embedding_struct=R"pyds( 
-            Allocate an :class:`EmbeddingMetadata`. 
+
+        constexpr const char* alloc_embedding_struct=R"pyds(
+            Allocate an :class:`EmbeddingMetadata`.
 
             :returns: Allocated :class:`EmbeddingMetadata`)pyds";
+
+        constexpr const char* alloc_reidembedding_struct=R"pyds(
+            Allocate an :class:`ReIDEmbeddingMetadata`.
+
+            :returns: Allocated :class:`ReIDEmbeddingMetadata`)pyds";
 
         constexpr const char* configure_source_for_ntp_sync=R"pyds(
             Configure the source to generate NTP sync values for RTSP sources.
