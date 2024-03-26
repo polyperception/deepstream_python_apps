@@ -24,7 +24,7 @@ namespace embedding
 namespace EmbeddingMetadata
 {
             constexpr const char* descr = R"pyds(
-                Holds embeddings for each detected objects after pgie.
+                Holds embeddings from pgie for each detected objects.
 
                 :ivar embedding: *vector<int>*, embeddings)pyds";
 
