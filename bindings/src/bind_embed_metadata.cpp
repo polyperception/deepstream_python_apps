@@ -36,5 +36,8 @@ bindembedding (py::module &m)
       },
       py::return_value_policy::reference,
       pydsdoc::methodsDoc::alloc_embedding_struct);
+
+  m.attr ("NVDS_USER_META_DETECTION_EMBEDDING")
+      = py::cast (NVDS_USER_META_DETECTION_EMBEDDING);
 }
 }
