@@ -1,7 +1,7 @@
 #include "../../docstrings/functionsdoc.h"
 #include "../../docstrings/reidembed_metadata_doc.h"
 #include "pyds.hpp"
-#include "reid_embeddings.h" // Include the actual C++ header file for EmbeddingMetadata
+#include "reid_embedding.h" // Include the actual C++ header file for EmbeddingMetadata
 
 namespace py = pybind11;
 
