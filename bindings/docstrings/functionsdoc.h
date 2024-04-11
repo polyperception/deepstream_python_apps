@@ -597,6 +597,11 @@ namespace methodsDoc
 
             :returns: Allocated :class:`EmbeddingMetadata`)pyds";
 
+        constexpr const char* alloc_label_struct=R"pyds(
+            Allocate an :class:`LabelsMetadata`.
+
+            :returns: Allocated :class:`LabelsMetadata`)pyds";
+
         constexpr const char* alloc_reidembedding_struct=R"pyds(
             Allocate an :class:`ReIDEmbeddingMetadata`.
 

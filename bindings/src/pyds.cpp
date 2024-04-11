@@ -16,6 +16,7 @@
  */
 
 #include "bind_embed_metadata.hpp"
+#include "bind_label.hpp"
 #include "bind_reidembed_metadata.hpp"
 #include "bindanalyticsmeta.hpp"
 #include "bindfunctions.hpp"
@@ -68,6 +69,7 @@ PYBIND11_MODULE (pyds, m)
   bindopticalflowmeta (m);
   bindreidembedding (m);
   bindembedding (m);
+  bindlabel (m);
 
 } // end PYBIND11_MODULE(pyds, m)
 }
