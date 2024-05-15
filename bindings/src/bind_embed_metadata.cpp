@@ -14,7 +14,7 @@ bindembedding (py::module &m)
                                  pydsdoc::embedding::EmbeddingMetadata::descr)
       .def (py::init<> ())
       // binding embedding int with EmbeddingMetadata vector
-      .def_readwrite ("embedding", &EmbeddingMetadata::embedding)
+      .def_readonly ("embedding", &EmbeddingMetadata::embedding)
       // binding function to cast user_meta_data to EmbeddingMetadata
       .def (
           "cast", [] (void *data) { return (EmbeddingMetadata *)data; },
@@ -24,18 +24,6 @@ bindembedding (py::module &m)
   // binding function used to allocate memory for struct in C
   // Memory ownership is maintained by bindings and only reference is passed to
   // Python
-  m.def (
-      "alloc_embedding_struct",
-      [] (NvDsUserMeta *meta) {
-        auto *mem
-            = (EmbeddingMetadata *)g_malloc0 (sizeof (EmbeddingMetadata));
-        meta->base_meta.copy_func = (NvDsMetaCopyFunc)copy_embedding_struct;
-        meta->base_meta.release_func
-            = (NvDsMetaReleaseFunc)release_embedding_struct;
-        return mem;
-      },
-      py::return_value_policy::reference,
-      pydsdoc::methodsDoc::alloc_embedding_struct);
 
   m.attr ("NVDS_USER_META_DETECTION_EMBEDDING")
       = py::cast (NVDS_USER_META_DETECTION_EMBEDDING);
