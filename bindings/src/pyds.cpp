@@ -18,6 +18,7 @@
 #include "bind_embed_metadata.hpp"
 #include "bind_label.hpp"
 #include "bind_reidembed_metadata.hpp"
+#include "bind_tracker_status_metadata.hpp"
 #include "bindanalyticsmeta.hpp"
 #include "bindfunctions.hpp"
 #include "bindgstnvdsmeta.hpp"
@@ -70,6 +71,7 @@ PYBIND11_MODULE (pyds, m)
   bindreidembedding (m);
   bindembedding (m);
   bindlabel (m);
+  bindtrackerstatus (m);
 
 } // end PYBIND11_MODULE(pyds, m)
 }
