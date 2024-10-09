@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &
+ * SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION &
  * AFFILIATES. All rights reserved. SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -438,6 +438,8 @@ namespace methodsDoc
         constexpr const char* alloc_nvds_event_msg_meta=R"pyds(
             Allocate an :class:`NvDsEventMsgMeta`.
 
+            :arg user_meta: An object of type :class:`NvDsUserMeta` acquired from user_meta_pool present in :class:`NvDsBatchMeta`
+
             :returns: Allocated :class:`NvDsEventMsgMeta`)pyds";
 
         constexpr const char* alloc_nvds_event=R"pyds(
@@ -617,5 +619,23 @@ namespace methodsDoc
             This function only works for RTSP sources i.e. GStreamer elements "rtspsrc" or "uridecodebin" with an RTSP uri.
 
             :arg src_elem: GStreamer source element to be configured.)pyds";
-	}
-}
+
+        constexpr const char* nvds_measure_buffer_latency=R"pyds(
+        Measures the latency of all frames present in the current batch.
+
+            :arg buffer: GstBuffer from which to retrieve the :class:`NvDsBatchMeta`
+
+            :returns: :sources number in batch.
+
+            Example usage:
+            ::
+
+#enable pipeline latency measurement
+            export NVDS_ENABLE_LATENCY_MEASUREMENT=1
+#enable compoment latency measurement
+            export NVDS_ENABLE_COMPONENT_LATENCY_MEASUREMENT=1
+
+#add this code in plugin probe function.
+            num_sources_in_batch = pyds.nvds_measure_buffer_latency(hash(gst_buffer));)pyds";
+        }
+        }

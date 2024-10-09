@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 import sys
 sys.path.append("../")
 from common.bus_call import bus_call
-from common.is_aarch_64 import is_aarch64
+from common.platform_info import PlatformInfo
 import pyds
 import platform
 import math
@@ -41,7 +41,7 @@ PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
 MUXER_OUTPUT_WIDTH = 1920
 MUXER_OUTPUT_HEIGHT = 1080
-MUXER_BATCH_TIMEOUT_USEC = 4000000
+MUXER_BATCH_TIMEOUT_USEC = 33000
 TILED_OUTPUT_WIDTH = 1280
 TILED_OUTPUT_HEIGHT = 720
 GST_CAPS_FEATURES_NVMM = "memory:NVMM"
@@ -175,6 +175,7 @@ def main(args):
     # Check input arguments
     number_sources = len(args)
 
+    platform_info = PlatformInfo()
     # Standard GStreamer initialization
     Gst.init(None)
 
@@ -204,7 +205,7 @@ def main(args):
             sys.stderr.write("Unable to create source bin \n")
         pipeline.add(source_bin)
         padname = "sink_%u" % i
-        sinkpad = streammux.get_request_pad(padname)
+        sinkpad = streammux.request_pad_simple(padname)
         if not sinkpad:
             sys.stderr.write("Unable to create sink pad bin \n")
         srcpad = source_bin.get_static_pad("src")
@@ -252,7 +253,7 @@ def main(args):
     if not encoder:
         sys.stderr.write(" Unable to create encoder")
     encoder.set_property("bitrate", bitrate)
-    if is_aarch64():
+    if platform_info.is_integrated_gpu():
         encoder.set_property("preset-level", 1)
         encoder.set_property("insert-sps-pps", 1)
         #encoder.set_property("bufapi-version", 1)
@@ -281,7 +282,7 @@ def main(args):
     streammux.set_property("width", 1920)
     streammux.set_property("height", 1080)
     streammux.set_property("batch-size", number_sources)
-    streammux.set_property("batched-push-timeout", 4000000)
+    streammux.set_property("batched-push-timeout", MUXER_BATCH_TIMEOUT_USEC)
     
     if ts_from_rtsp:
         streammux.set_property("attach-sys-ts", 0)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import configparser
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import GLib, Gst
-from common.is_aarch_64 import is_aarch64
+from common.platform_info import PlatformInfo
 from common.bus_call import bus_call
 
 import pyds
@@ -34,6 +34,7 @@ PGIE_CLASS_ID_VEHICLE = 0
 PGIE_CLASS_ID_BICYCLE = 1
 PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
+MUXER_BATCH_TIMEOUT_USEC = 33000
 
 def osd_sink_pad_buffer_probe(pad,info,u_data):
     frame_number=0
@@ -129,30 +130,30 @@ def osd_sink_pad_buffer_probe(pad,info,u_data):
             break
         if(user_meta and user_meta.base_meta.meta_type==pyds.NvDsMetaType.NVDS_TRACKER_PAST_FRAME_META):
             try:
-                # Note that user_meta.user_meta_data needs a cast to pyds.NvDsPastFrameObjBatch
-                # The casting is done by pyds.NvDsPastFrameObjBatch.cast()
+                # Note that user_meta.user_meta_data needs a cast to pyds.NvDsTargetMiscDataBatch
+                # The casting is done by pyds.NvDsTargetMiscDataBatch.cast()
                 # The casting also keeps ownership of the underlying memory
                 # in the C code, so the Python garbage collector will leave
                 # it alone
-                pPastFrameObjBatch = pyds.NvDsPastFrameObjBatch.cast(user_meta.user_meta_data)
+                pPastDataBatch = pyds.NvDsTargetMiscDataBatch.cast(user_meta.user_meta_data)
             except StopIteration:
                 break
-            for trackobj in pyds.NvDsPastFrameObjBatch.list(pPastFrameObjBatch):
-                print("streamId=",trackobj.streamID)
-                print("surfaceStreamID=",trackobj.surfaceStreamID)
-                for pastframeobj in pyds.NvDsPastFrameObjStream.list(trackobj):
-                    print("numobj=",pastframeobj.numObj)
-                    print("uniqueId=",pastframeobj.uniqueId)
-                    print("classId=",pastframeobj.classId)
-                    print("objLabel=",pastframeobj.objLabel)
-                    for objlist in pyds.NvDsPastFrameObjList.list(pastframeobj):
-                        print('frameNum:', objlist.frameNum)
-                        print('tBbox.left:', objlist.tBbox.left)
-                        print('tBbox.width:', objlist.tBbox.width)
-                        print('tBbox.top:', objlist.tBbox.top)
-                        print('tBbox.right:', objlist.tBbox.height)
-                        print('confidence:', objlist.confidence)
-                        print('age:', objlist.age)
+            for miscDataStream in pyds.NvDsTargetMiscDataBatch.list(pPastDataBatch):
+                print("streamId=",miscDataStream.streamID)
+                print("surfaceStreamID=",miscDataStream.surfaceStreamID)
+                for miscDataObj in pyds.NvDsTargetMiscDataStream.list(miscDataStream):
+                    print("numobj=",miscDataObj.numObj)
+                    print("uniqueId=",miscDataObj.uniqueId)
+                    print("classId=",miscDataObj.classId)
+                    print("objLabel=",miscDataObj.objLabel)
+                    for miscDataFrame in pyds.NvDsTargetMiscDataObject.list(miscDataObj):
+                        print('frameNum:', miscDataFrame.frameNum)
+                        print('tBbox.left:', miscDataFrame.tBbox.left)
+                        print('tBbox.width:', miscDataFrame.tBbox.width)
+                        print('tBbox.top:', miscDataFrame.tBbox.top)
+                        print('tBbox.right:', miscDataFrame.tBbox.height)
+                        print('confidence:', miscDataFrame.confidence)
+                        print('age:', miscDataFrame.age)
         try:
             l_user=l_user.next
         except StopIteration:
@@ -165,6 +166,7 @@ def main(args):
         sys.stderr.write("usage: %s <h264_elementary_stream>\n" % args[0])
         sys.exit(1)
 
+    platform_info = PlatformInfo()
     # Standard GStreamer initialization
 
     Gst.init(None)
@@ -220,10 +222,6 @@ def main(args):
     if not sgie2:
         sys.stderr.write(" Unable to make sgie2 \n")
 
-    sgie3 = Gst.ElementFactory.make("nvinfer", "secondary3-nvinference-engine")
-    if not sgie3:
-        sys.stderr.write(" Unable to make sgie3 \n")
-
     nvvidconv = Gst.ElementFactory.make("nvvideoconvert", "convertor")
     if not nvvidconv:
         sys.stderr.write(" Unable to create nvvidconv \n")
@@ -235,14 +233,18 @@ def main(args):
         sys.stderr.write(" Unable to create nvosd \n")
 
     # Finally render the osd output
-    if is_aarch64():
+    if platform_info.is_integrated_gpu():
         print("Creating nv3dsink \n")
         sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
         if not sink:
             sys.stderr.write(" Unable to create nv3dsink \n")
     else:
-        print("Creating EGLSink \n")
-        sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
+        if platform_info.is_platform_aarch64():
+            print("Creating nv3dsink \n")
+            sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
+        else:
+            print("Creating EGLSink \n")
+            sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
         if not sink:
             sys.stderr.write(" Unable to create egl sink \n")
 
@@ -251,13 +253,12 @@ def main(args):
     streammux.set_property('width', 1920)
     streammux.set_property('height', 1080)
     streammux.set_property('batch-size', 1)
-    streammux.set_property('batched-push-timeout', 4000000)
+    streammux.set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
 
     #Set properties of pgie and sgie
     pgie.set_property('config-file-path', "dstest2_pgie_config.txt")
     sgie1.set_property('config-file-path', "dstest2_sgie1_config.txt")
     sgie2.set_property('config-file-path', "dstest2_sgie2_config.txt")
-    sgie3.set_property('config-file-path', "dstest2_sgie3_config.txt")
 
     #Set properties of tracker
     config = configparser.ConfigParser()
@@ -290,7 +291,6 @@ def main(args):
     pipeline.add(tracker)
     pipeline.add(sgie1)
     pipeline.add(sgie2)
-    pipeline.add(sgie3)
     pipeline.add(nvvidconv)
     pipeline.add(nvosd)
     pipeline.add(sink)
@@ -302,7 +302,7 @@ def main(args):
     source.link(h264parser)
     h264parser.link(decoder)
 
-    sinkpad = streammux.get_request_pad("sink_0")
+    sinkpad = streammux.request_pad_simple("sink_0")
     if not sinkpad:
         sys.stderr.write(" Unable to get the sink pad of streammux \n")
     srcpad = decoder.get_static_pad("src")
@@ -313,8 +313,7 @@ def main(args):
     pgie.link(tracker)
     tracker.link(sgie1)
     sgie1.link(sgie2)
-    sgie2.link(sgie3)
-    sgie3.link(nvvidconv)
+    sgie2.link(nvvidconv)
     nvvidconv.link(nvosd)
     nvosd.link(sink)
 

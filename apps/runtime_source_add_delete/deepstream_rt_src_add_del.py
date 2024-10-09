@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ import sys
 import math
 import random
 import platform
-from common.is_aarch_64 import is_aarch64
+from common.platform_info import PlatformInfo
 
 import pyds
 
@@ -41,7 +41,7 @@ PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
 MUXER_OUTPUT_WIDTH=1920
 MUXER_OUTPUT_HEIGHT=1080
-MUXER_BATCH_TIMEOUT_USEC=4000000
+MUXER_BATCH_TIMEOUT_USEC = 33000
 TILED_OUTPUT_WIDTH=1280
 TILED_OUTPUT_HEIGHT=720
 GPU_ID = 0
@@ -52,7 +52,6 @@ TRACKER_CONFIG_FILE = "dstest_tracker_config.txt"
 
 SGIE1_CONFIG_FILE = "dstest_sgie1_config.txt"
 SGIE2_CONFIG_FILE = "dstest_sgie2_config.txt"
-SGIE3_CONFIG_FILE = "dstest_sgie3_config.txt"
 
 CONFIG_GPU_ID = "gpu-id"
 CONFIG_GROUP_TRACKER = "tracker"
@@ -78,7 +77,6 @@ sink = None
 pgie = None
 sgie1 = None
 sgie2 = None
-sgie3 = None
 nvvideoconvert = None
 nvosd = None
 tiler = None
@@ -89,7 +87,7 @@ def decodebin_child_added(child_proxy,Object,name,user_data):
     if(name.find("decodebin") != -1):
         Object.connect("child-added",decodebin_child_added,user_data)   
     if(name.find("nvv4l2decoder") != -1):
-        if (is_aarch64()):
+        if (platform_info.is_integrated_gpu()):
             Object.set_property("enable-max-performance", True)
             Object.set_property("drop-frame-interval", 0)
             Object.set_property("num-extra-surfaces", 0)
@@ -112,7 +110,9 @@ def cb_newpad(decodebin,pad,data):
         pad_name = "sink_%u" % source_id
         print(pad_name)
         #Get a sink pad from the streammux, link to decodebin
-        sinkpad = streammux.get_request_pad(pad_name)
+        sinkpad = streammux.request_pad_simple(pad_name)
+        if not sinkpad:
+            sys.stderr.write("Unable to create sink pad bin \n")
         if pad.link(sinkpad) == Gst.PadLinkReturn.OK:
             print("Decodebin linked to pipeline")
         else:
@@ -316,7 +316,6 @@ def main(args):
     global pgie
     global sgie1
     global sgie2
-    global sgie3
     global nvvideoconvert
     global nvosd
     global tiler
@@ -328,6 +327,8 @@ def main(args):
 
     num_sources=len(args)-1
 
+    global platform_info
+    platform_info = PlatformInfo()
     # Standard GStreamer initialization
     Gst.init(None)
 
@@ -401,19 +402,19 @@ def main(args):
     if not sgie1:
         sys.stderr.write(" Unable to make sgie2 \n")
 
-    sgie3 = Gst.ElementFactory.make("nvinfer", "secondary3-nvinference-engine")
-    if not sgie3:
-        sys.stderr.write(" Unable to make sgie3 \n")
 
-
-    if is_aarch64():
+    if platform_info.is_integrated_gpu():
         print("Creating nv3dsink \n")
         sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
         if not sink:
             sys.stderr.write(" Unable to create nv3dsink \n")
     else:
-        print("Creating EGLSink \n")
-        sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
+        if platform_info.is_platform_aarch64():
+            print("Creating nv3dsink \n")
+            sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
+        else:
+            print("Creating EGLSink \n")
+            sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
         if not sink:
             sys.stderr.write(" Unable to create egl sink \n")
     if is_live:
@@ -423,11 +424,10 @@ def main(args):
     #Set streammux width and height
     streammux.set_property('width', MUXER_OUTPUT_WIDTH)
     streammux.set_property('height', MUXER_OUTPUT_HEIGHT)
-    #Set pgie, sgie1, sgie2, and sgie3 configuration file paths
+    #Set pgie, sgie1, and sgie2 configuration file paths
     pgie.set_property('config-file-path', PGIE_CONFIG_FILE)
     sgie1.set_property('config-file-path', SGIE1_CONFIG_FILE)
     sgie2.set_property('config-file-path', SGIE2_CONFIG_FILE)
-    sgie3.set_property('config-file-path', SGIE3_CONFIG_FILE)
 
     #Set properties of tracker
     config = configparser.ConfigParser()
@@ -464,7 +464,6 @@ def main(args):
     pgie.set_property("gpu_id", GPU_ID)
     sgie1.set_property("gpu_id", GPU_ID)
     sgie2.set_property("gpu_id", GPU_ID)
-    sgie3.set_property("gpu_id", GPU_ID)
 
     #Set tiler properties
     tiler_rows=int(math.sqrt(num_sources))
@@ -479,8 +478,8 @@ def main(args):
     nvvideoconvert.set_property("gpu_id", GPU_ID)
     nvosd.set_property("gpu_id", GPU_ID)
 
-    #Set gpu ID of sink if not aarch64
-    if(not is_aarch64()):
+    #Set gpu ID of sink if not integrated gpu
+    if(not platform_info.is_integrated_gpu() and not platform_info.is_platform_aarch64()):
         sink.set_property("gpu_id", GPU_ID)
 
     print("Adding elements to Pipeline \n")
@@ -488,7 +487,6 @@ def main(args):
     pipeline.add(tracker)
     pipeline.add(sgie1)
     pipeline.add(sgie2)
-    pipeline.add(sgie3)
     pipeline.add(tiler)
     pipeline.add(nvvideoconvert)
     pipeline.add(nvosd)
@@ -496,14 +494,13 @@ def main(args):
 
     # We link elements in the following order:
     # sourcebin -> streammux -> nvinfer -> nvtracker -> nvdsanalytics ->
-    # nvtiler -> nvvideoconvert -> nvdsosd -> (if aarch64, transform ->) sink
+    # nvtiler -> nvvideoconvert -> nvdsosd -> sink
     print("Linking elements in the Pipeline \n")
     streammux.link(pgie)
     pgie.link(tracker)
     tracker.link(sgie1)
     sgie1.link(sgie2)
-    sgie2.link(sgie3)
-    sgie3.link(tiler)
+    sgie2.link(tiler)
     tiler.link(nvvideoconvert)
     nvvideoconvert.link(nvosd)
     nvosd.link(sink)
