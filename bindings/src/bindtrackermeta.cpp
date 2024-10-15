@@ -43,19 +43,9 @@ bindtrackermeta (py::module &m)
           py::return_value_policy::reference,
           pydsdoc::trackerdoc::NvDsTargetMiscDataFrameDoc::cast);
 
-  py::class_<NvDsPastFrameObjList> (
-      m, "NvDsPastFrameObjList",
-      pydsdoc::trackerdoc::NvDsPastFrameObjListDoc::descr)
-      .def (py::init<> ())
-      .def_readwrite ("numObj", &NvDsPastFrameObjList::numObj)
-      .def_readwrite ("uniqueId", &NvDsPastFrameObjList::uniqueId)
-      .def_readwrite ("classId", &NvDsPastFrameObjList::classId)
-      .def_property ("objLabel",
-                     STRING_CHAR_ARRAY (NvDsPastFrameObjList, objLabel))
-
-          py::class_<NvDsTargetMiscDataObject> (
-              m, "NvDsTargetMiscDataObject",
-              pydsdoc::trackerdoc::NvDsTargetMiscDataObjectDoc::descr)
+  py::class_<NvDsTargetMiscDataObject> (
+      m, "NvDsTargetMiscDataObject",
+      pydsdoc::trackerdoc::NvDsTargetMiscDataObjectDoc::descr)
       .def (py::init<> ())
       .def_readwrite ("numObj", &NvDsTargetMiscDataObject::numObj)
       .def_readwrite ("uniqueId", &NvDsTargetMiscDataObject::uniqueId)
@@ -76,44 +66,28 @@ bindtrackermeta (py::module &m)
           py::keep_alive<0, 1> (), py::return_value_policy::reference,
           pydsdoc::trackerdoc::NvDsTargetMiscDataObjectDoc::list);
 
-  .def (
-      "cast", [] (void *data) { return (NvDsPastFrameObjStream *)data; },
-      py::return_value_policy::reference,
-      pydsdoc::trackerdoc::NvDsPastFrameObjStreamDoc::cast)
+  py::class_<NvDsTargetMiscDataStream> (
+      m, "NvDsTargetMiscDataStream",
+      pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::descr)
+      .def (py::init<> ())
+      .def_readwrite ("streamID", &NvDsTargetMiscDataStream::streamID)
+      .def_readwrite ("surfaceStreamID",
+                      &NvDsTargetMiscDataStream::surfaceStreamID)
+      .def_readwrite ("numAllocated", &NvDsTargetMiscDataStream::numAllocated)
+      .def_readwrite ("numFilled", &NvDsTargetMiscDataStream::numFilled)
 
-      py::class_<NvDsTargetMiscDataStream> (
-          m, "NvDsTargetMiscDataStream",
-          pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::descr)
-          .def (py::init<> ())
-          .def_readwrite ("streamID", &NvDsTargetMiscDataStream::streamID)
-          .def_readwrite ("surfaceStreamID",
-                          &NvDsTargetMiscDataStream::surfaceStreamID)
-          .def_readwrite ("numAllocated",
-                          &NvDsTargetMiscDataStream::numAllocated)
-          .def_readwrite ("numFilled", &NvDsTargetMiscDataStream::numFilled)
+      .def (
+          "cast", [] (void *data) { return (NvDsTargetMiscDataStream *)data; },
+          py::return_value_policy::reference,
+          pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::cast)
 
-          .def (
-              "cast",
-              [] (void *data) { return (NvDsTargetMiscDataStream *)data; },
-              py::return_value_policy::reference,
-              pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::cast)
-
-          .def (
-              "list",
-              [] (NvDsTargetMiscDataStream &self) {
-                return py::make_iterator (self.list,
-                                          self.list + self.numFilled);
-              },
-              py::keep_alive<0, 1> (), py::return_value_policy::reference,
-              pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::list);
-
-  .def (
-      "list",
-      [] (NvDsPastFrameObjBatch &self) {
-        return py::make_iterator (self.list, self.list + self.numFilled);
-      },
-      py::keep_alive<0, 1> (), py::return_value_policy::reference,
-      pydsdoc::trackerdoc::NvDsPastFrameObjBatchDoc::list);
+      .def (
+          "list",
+          [] (NvDsTargetMiscDataStream &self) {
+            return py::make_iterator (self.list, self.list + self.numFilled);
+          },
+          py::keep_alive<0, 1> (), py::return_value_policy::reference,
+          pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::list);
 
   py::class_<NvDsTargetMiscDataBatch> (
       m, "NvDsTargetMiscDataBatch",
@@ -134,8 +108,7 @@ bindtrackermeta (py::module &m)
           },
           py::keep_alive<0, 1> (), py::return_value_policy::reference,
           pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::list);
-
-  m.attr ("UNTRACKED_OBJECT_ID") = py::cast (UNTRACKED_OBJECT_ID);
+   m.attr ("UNTRACKED_OBJECT_ID") = py::cast (UNTRACKED_OBJECT_ID);
 }
 
 }
