@@ -101,18 +101,6 @@ bindtrackermeta (py::module &m)
           py::return_value_policy::reference,
           pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::cast)
 
-          py::class_<NvDsTargetMiscDataBatch> (
-              m, "NvDsTargetMiscDataBatch",
-              pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::descr)
-      .def (py::init<> ())
-      .def_readwrite ("numAllocated", &NvDsTargetMiscDataBatch::numAllocated)
-      .def_readwrite ("numFilled", &NvDsTargetMiscDataBatch::numFilled)
-
-      .def (
-          "cast", [] (void *data) { return (NvDsTargetMiscDataBatch *)data; },
-          py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::cast)
-
       .def (
           "list",
           [] (NvDsTargetMiscDataBatch &self) {
