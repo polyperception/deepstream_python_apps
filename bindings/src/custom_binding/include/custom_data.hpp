@@ -1,6 +1,6 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION &
+ * AFFILIATES. All rights reserved. SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <string>
 
-// NvDsTrackerMeta
+using namespace std;
 
-
-#include "../../docstrings/trackermetadoc.h"
-#include "pyds.hpp"
-#include "pybind11/numpy.h"
-
-namespace py = pybind11;
-
-namespace pydeepstream {
-    void bindtrackermeta(py::module &m);
-}
+struct CustomDataStruct
+{
+  int structId;
+  char *message;
+  int sampleInt;
+};

@@ -1,6 +1,7 @@
 /*
- * SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION &
- * AFFILIATES. All rights reserved. SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Copyright (c) 2019-2024 NVIDIA CORPORATION &
+AFFILIATES. All rights reserved.
+ * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +16,7 @@
  * limitations under the License.
  */
 
+#include "pyds.hpp"
 #include "bind_embed_metadata.hpp"
 #include "bind_label.hpp"
 #include "bind_reidembed_metadata.hpp"
@@ -30,14 +32,13 @@
 #include "bindopticalflow.hpp"
 #include "bindschema.hpp"
 #include "bindtrackermeta.hpp"
-
-#include "pyds.hpp"
+#include "custom_binding/include/bindcustom.hpp"
 
 /*#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <ndarrayobject.h>*/
 
-#define PYDS_VERSION "1.1.11"
+#define PYDS_VERSION "1.2.0"
 
 using namespace std;
 namespace py = pybind11;
@@ -68,6 +69,8 @@ PYBIND11_MODULE (pyds, m)
   bindnvbufsurface (m);
   bindnvdsinfer (m);
   bindopticalflowmeta (m);
+  bindutils (m);
+  bindcustom (m);
   bindreidembedding (m);
   bindembedding (m);
   bindlabel (m);
