@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2019-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import math
 
 gi.require_version('Gst', '1.0')
 from gi.repository import GLib, Gst
-from common.is_aarch_64 import is_aarch64
+from common.platform_info import PlatformInfo
 from common.bus_call import bus_call
 import cv2
 import pyds
@@ -36,7 +36,7 @@ from os import path
 MAX_DISPLAY_LEN = 64
 MUXER_OUTPUT_WIDTH = 1920
 MUXER_OUTPUT_HEIGHT = 1080
-MUXER_BATCH_TIMEOUT_USEC = 4000000
+MUXER_BATCH_TIMEOUT_USEC = 33000
 TILED_OUTPUT_WIDTH = 1280
 TILED_OUTPUT_HEIGHT = 720
 COLORS = [[128, 128, 64], [0, 0, 128], [0, 128, 128], [128, 0, 0],
@@ -140,6 +140,7 @@ def main(args):
     config_file = args[1]
     num_sources = len(args) - 3
     # Standard GStreamer initialization
+    platform_info = PlatformInfo()
     Gst.init(None)
 
     # Create gstreamer elements
@@ -189,26 +190,30 @@ def main(args):
     if not nvsegvisual:
         sys.stderr.write("Unable to create nvsegvisual\n")
 
-    if is_aarch64():
+    if platform_info.is_integrated_gpu():
         print("Creating nv3dsink \n")
         sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
         if not sink:
             sys.stderr.write(" Unable to create nv3dsink \n")
     else:
-        print("Creating EGLSink \n")
-        sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
+        if platform_info.is_platform_aarch64():
+            print("Creating nv3dsink \n")
+            sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
+        else:
+            print("Creating EGLSink \n")
+            sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
         if not sink:
             sys.stderr.write(" Unable to create egl sink \n")
 
     print("Playing file %s " % args[2])
     source.set_property('location', args[2])
-    if is_aarch64() and ("mjpeg" in args[2] or "mjpg" in args[2]):
+    if platform_info.is_integrated_gpu() and ("mjpeg" in args[2] or "mjpg" in args[2]):
         print ("setting decoder mjpeg property")
         decoder.set_property('mjpeg', 1)
     streammux.set_property('width', 1920)
     streammux.set_property('height', 1080)
     streammux.set_property('batch-size', 1)
-    streammux.set_property('batched-push-timeout', 4000000)
+    streammux.set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
     seg.set_property('config-file-path', config_file)
     pgie_batch_size = seg.get_property("batch-size")
     if pgie_batch_size != num_sources:
@@ -237,7 +242,7 @@ def main(args):
     source.link(jpegparser)
     jpegparser.link(decoder)
 
-    sinkpad = streammux.get_request_pad("sink_0")
+    sinkpad = streammux.request_pad_simple("sink_0")
     if not sinkpad:
         sys.stderr.write(" Unable to get the sink pad of streammux \n")
     srcpad = decoder.get_static_pad("src")

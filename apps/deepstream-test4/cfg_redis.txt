@@ -1,5 +1,5 @@
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2019-2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2020-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,11 @@
 # limitations under the License.
 ################################################################################
 
-import platform
-import sys
-
-
-def is_aarch64():
-    return platform.uname()[4] == 'aarch64'
-
-sys.path.append('/opt/nvidia/deepstream/deepstream/lib')
+[message-broker]
+#hostname=localhost
+#port=6379
+#streamsize=10000
+#payloadkey=metadata
+#consumergroup=mygroup
+#consumername=myname
+#share-connection = 1

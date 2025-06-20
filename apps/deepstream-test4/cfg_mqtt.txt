@@ -1,5 +1,5 @@
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2018-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+
 [message-broker]
-#connection_str = HostName=<my-hub>.azure-devices.net;DeviceId=<device_id>;SharedAccessKey=<my-policy-key>
-#shared_access_key = <my-policy-key>
-#custom_msg_properties =  <key>=<value>;
+username = user
+password = password
+client-id = uniqueID
+#enable-tls = 1
+#tls-cafile =
+#tls-capath =
+#tls-certfile =
+#tls-keyfile =
+#share-connection = 1
+#loop-timeout = 2000
+#keep-alive = 60

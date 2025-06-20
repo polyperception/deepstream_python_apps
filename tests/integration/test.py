@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,11 @@
 import pytest
 import pyds
 
-from tests.common.frame_iterator import FrameIterator
-from tests.common.pipeline_fakesink import PipelineFakesink
-from tests.common.pipeline_fakesink_tracker import PipelineFakesinkTracker
-from tests.common.tracker_utils import get_tracker_properties_from_config
-from tests.common.utils import is_aarch64
+from tests.testcommon.frame_iterator import FrameIterator
+from tests.testcommon.pipeline_fakesink import PipelineFakesink
+from tests.testcommon.pipeline_fakesink_tracker import PipelineFakesinkTracker
+from tests.testcommon.tracker_utils import get_tracker_properties_from_config
+from tests.testcommon.utils import is_integrated_gpu
 
 VIDEO_PATH1 = "/opt/nvidia/deepstream/deepstream/samples/streams/sample_720p.h264"
 STANDARD_PROPERTIES1 = {
@@ -57,9 +57,6 @@ STANDARD_PROPERTIES_TRACKER1 = {
     },
     "secondary2-nvinference-engine": {
         "config-file-path", "ds_sgie2_config.txt"
-    },
-    "secondary3-nvinference-engine": {
-        "config-file-path", "ds_sgie3_config.txt"
     }
 }
 STANDARD_CLASS_ID1 = {
@@ -97,7 +94,7 @@ def test_pipeline1():
     probe_function = FrameIterator(frame_function, box_function, data_probe)
 
     # Creating the pipeline
-    sp = PipelineFakesink(STANDARD_PROPERTIES1, is_aarch64())
+    sp = PipelineFakesink(STANDARD_PROPERTIES1, is_integrated_gpu())
     # registering the probe function
     sp.set_probe(probe_function)
 
@@ -138,24 +135,24 @@ def test_pipeline2():
             return
         if not user_meta.base_meta.meta_type == pyds.NvDsMetaType.NVDS_TRACKER_PAST_FRAME_META:
             return
-        pPastFrameObjBatch = pyds.NvDsPastFrameObjBatch.cast(user_meta.user_meta_data)
+        miscDataBatch = pyds.NvDsTargetMiscDataBatch.cast(user_meta.user_meta_data)
         tracker_data = dict_data["tracker_data"]
-        for trackobj in pyds.NvDsPastFrameObjBatch.list(pPastFrameObjBatch):
-            tracker_data["stream_id"].add(trackobj.streamID)
-            tracker_data["surface_stream_id"].add(trackobj.surfaceStreamID)
-            for pastframeobj in pyds.NvDsPastFrameObjStream.list(trackobj):
-                tracker_data["numobj"].add(pastframeobj.numObj)
-                tracker_data["unique_id"].add(pastframeobj.uniqueId)
-                tracker_data["class_id"].add(pastframeobj.classId)
-                tracker_data["obj_label"].add(pastframeobj.objLabel)
-                for objlist in pyds.NvDsPastFrameObjList.list(pastframeobj):
-                    tracker_data["frame_num"].add(objlist.frameNum)
-                    tracker_data["tbox_left"].add(objlist.tBbox.left)
-                    tracker_data["tbox_width"].add(objlist.tBbox.width)
-                    tracker_data["tbox_top"].add(objlist.tBbox.top)
-                    tracker_data["tbox_right"].add(objlist.tBbox.height)
-                    tracker_data["confidence"].add(objlist.confidence)
-                    tracker_data["age"].add(objlist.confidence)
+        for miscDataStream in pyds.NvDsTargetMiscDataBatch.list(miscDataBatch):
+            tracker_data["stream_id"].add(miscDataStream.streamID)
+            tracker_data["surface_stream_id"].add(miscDataStream.surfaceStreamID)
+            for miscDataObj in pyds.NvDsTargetMiscDataStream.list(miscDataStream):
+                tracker_data["numobj"].add(miscDataObj.numObj)
+                tracker_data["unique_id"].add(miscDataObj.uniqueId)
+                tracker_data["class_id"].add(miscDataObj.classId)
+                tracker_data["obj_label"].add(miscDataObj.objLabel)
+                for miscDataFrame in pyds.NvDsTargetMiscDataObject.list(miscDataObj):
+                    tracker_data["frame_num"].add(miscDataFrame.frameNum)
+                    tracker_data["tbox_left"].add(miscDataFrame.tBbox.left)
+                    tracker_data["tbox_width"].add(miscDataFrame.tBbox.width)
+                    tracker_data["tbox_top"].add(miscDataFrame.tBbox.top)
+                    tracker_data["tbox_right"].add(miscDataFrame.tBbox.height)
+                    tracker_data["confidence"].add(miscDataFrame.confidence)
+                    tracker_data["age"].add(miscDataFrame.confidence)
 
     # defining the function to be called at each object
     def box_function(batch_meta, frame_meta, obj_meta, dict_data):
@@ -183,9 +180,6 @@ def test_pipeline2():
         "secondary2-nvinference-engine": {
             "config-file-path": "ds_sgie2_config.txt"
         },
-        "secondary3-nvinference-engine": {
-            "config-file-path": "ds_sgie3_config.txt"
-        },
         "tracker": tracker_cfg
     }
     print(properties)
@@ -208,7 +202,7 @@ def test_pipeline2():
                                    user_function)
 
     # Creating the pipeline
-    sp = PipelineFakesinkTracker(properties, is_aarch64())
+    sp = PipelineFakesinkTracker(properties, is_integrated_gpu())
     # registering the probe function
     sp.set_probe(probe_function)
 

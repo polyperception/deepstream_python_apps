@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2020-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2020-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ sys.path.append('../')
 import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import GLib, Gst
-from common.is_aarch_64 import is_aarch64
+from common.platform_info import PlatformInfo
 from common.bus_call import bus_call
 
 import pyds
@@ -31,7 +31,7 @@ PGIE_CLASS_ID_VEHICLE = 0
 PGIE_CLASS_ID_BICYCLE = 1
 PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
-
+MUXER_BATCH_TIMEOUT_USEC = 33000
 
 def osd_sink_pad_buffer_probe(pad,info,u_data):
     frame_number=0
@@ -124,6 +124,7 @@ def main(args):
         sys.stderr.write("usage: %s <v4l2-device-path>\n" % args[0])
         sys.exit(1)
 
+    platform_info = PlatformInfo()
     # Standard GStreamer initialization
     Gst.init(None)
 
@@ -195,14 +196,18 @@ def main(args):
         sys.stderr.write(" Unable to create nvosd \n")
 
     # Finally render the osd output
-    if is_aarch64():
+    if platform_info.is_integrated_gpu():
         print("Creating nv3dsink \n")
         sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
         if not sink:
             sys.stderr.write(" Unable to create nv3dsink \n")
     else:
-        print("Creating EGLSink \n")
-        sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
+        if platform_info.is_platform_aarch64():
+            print("Creating nv3dsink \n")
+            sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
+        else:
+            print("Creating EGLSink \n")
+            sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
         if not sink:
             sys.stderr.write(" Unable to create egl sink \n")
 
@@ -213,7 +218,7 @@ def main(args):
     streammux.set_property('width', 1920)
     streammux.set_property('height', 1080)
     streammux.set_property('batch-size', 1)
-    streammux.set_property('batched-push-timeout', 4000000)
+    streammux.set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
     pgie.set_property('config-file-path', "dstest1_pgie_config.txt")
     # Set sync = false to avoid late frame drops at the display-sink
     sink.set_property('sync', False)
@@ -239,7 +244,7 @@ def main(args):
     vidconvsrc.link(nvvidconvsrc)
     nvvidconvsrc.link(caps_vidconvsrc)
 
-    sinkpad = streammux.get_request_pad("sink_0")
+    sinkpad = streammux.request_pad_simple("sink_0")
     if not sinkpad:
         sys.stderr.write(" Unable to get the sink pad of streammux \n")
     srcpad = caps_vidconvsrc.get_static_pad("src")

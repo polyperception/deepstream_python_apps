@@ -29,86 +29,86 @@ void
 bindtrackermeta (py::module &m)
 {
   /*Start of Bindings for nvds_tracker_meta.h*/
-  py::class_<NvDsPastFrameObj> (
-      m, "NvDsPastFrameObj", pydsdoc::trackerdoc::NvDsPastFrameObjDoc::descr)
+  py::class_<NvDsTargetMiscDataFrame> (
+      m, "NvDsTargetMiscDataFrame",
+      pydsdoc::trackerdoc::NvDsTargetMiscDataFrameDoc::descr)
       .def (py::init<> ())
-      .def_readwrite ("frameNum", &NvDsPastFrameObj::frameNum)
-      .def_readwrite ("tBbox", &NvDsPastFrameObj::tBbox)
-      .def_readwrite ("confidence", &NvDsPastFrameObj::confidence)
-      .def_readwrite ("age", &NvDsPastFrameObj::age)
+      .def_readwrite ("frameNum", &NvDsTargetMiscDataFrame::frameNum)
+      .def_readwrite ("tBbox", &NvDsTargetMiscDataFrame::tBbox)
+      .def_readwrite ("confidence", &NvDsTargetMiscDataFrame::confidence)
+      .def_readwrite ("age", &NvDsTargetMiscDataFrame::age)
 
       .def (
-          "cast", [] (void *data) { return (NvDsPastFrameObj *)data; },
+          "cast", [] (void *data) { return (NvDsTargetMiscDataFrame *)data; },
           py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjDoc::cast);
+          pydsdoc::trackerdoc::NvDsTargetMiscDataFrameDoc::cast);
 
-  py::class_<NvDsPastFrameObjList> (
-      m, "NvDsPastFrameObjList",
-      pydsdoc::trackerdoc::NvDsPastFrameObjListDoc::descr)
+  py::class_<NvDsTargetMiscDataObject> (
+      m, "NvDsTargetMiscDataObject",
+      pydsdoc::trackerdoc::NvDsTargetMiscDataObjectDoc::descr)
       .def (py::init<> ())
-      .def_readwrite ("numObj", &NvDsPastFrameObjList::numObj)
-      .def_readwrite ("uniqueId", &NvDsPastFrameObjList::uniqueId)
-      .def_readwrite ("classId", &NvDsPastFrameObjList::classId)
+      .def_readwrite ("numObj", &NvDsTargetMiscDataObject::numObj)
+      .def_readwrite ("uniqueId", &NvDsTargetMiscDataObject::uniqueId)
+      .def_readwrite ("classId", &NvDsTargetMiscDataObject::classId)
       .def_property ("objLabel",
-                     STRING_CHAR_ARRAY (NvDsPastFrameObjList, objLabel))
+                     STRING_CHAR_ARRAY (NvDsTargetMiscDataObject, objLabel))
 
       .def (
-          "cast", [] (void *data) { return (NvDsPastFrameObjList *)data; },
+          "cast", [] (void *data) { return (NvDsTargetMiscDataObject *)data; },
           py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjListDoc::cast)
+          pydsdoc::trackerdoc::NvDsTargetMiscDataObjectDoc::cast)
 
       .def (
           "list",
-          [] (NvDsPastFrameObjList &self) {
+          [] (NvDsTargetMiscDataObject &self) {
             return py::make_iterator (self.list, self.list + self.numObj);
           },
           py::keep_alive<0, 1> (), py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjListDoc::list);
+          pydsdoc::trackerdoc::NvDsTargetMiscDataObjectDoc::list);
 
-  py::class_<NvDsPastFrameObjStream> (
-      m, "NvDsPastFrameObjStream",
-      pydsdoc::trackerdoc::NvDsPastFrameObjStreamDoc::descr)
+  py::class_<NvDsTargetMiscDataStream> (
+      m, "NvDsTargetMiscDataStream",
+      pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::descr)
       .def (py::init<> ())
-      .def_readwrite ("streamID", &NvDsPastFrameObjStream::streamID)
+      .def_readwrite ("streamID", &NvDsTargetMiscDataStream::streamID)
       .def_readwrite ("surfaceStreamID",
-                      &NvDsPastFrameObjStream::surfaceStreamID)
-      .def_readwrite ("numAllocated", &NvDsPastFrameObjStream::numAllocated)
-      .def_readwrite ("numFilled", &NvDsPastFrameObjStream::numFilled)
+                      &NvDsTargetMiscDataStream::surfaceStreamID)
+      .def_readwrite ("numAllocated", &NvDsTargetMiscDataStream::numAllocated)
+      .def_readwrite ("numFilled", &NvDsTargetMiscDataStream::numFilled)
 
       .def (
-          "cast", [] (void *data) { return (NvDsPastFrameObjStream *)data; },
+          "cast", [] (void *data) { return (NvDsTargetMiscDataStream *)data; },
           py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjStreamDoc::cast)
+          pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::cast)
 
       .def (
           "list",
-          [] (NvDsPastFrameObjStream &self) {
+          [] (NvDsTargetMiscDataStream &self) {
             return py::make_iterator (self.list, self.list + self.numFilled);
           },
           py::keep_alive<0, 1> (), py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjStreamDoc::list);
+          pydsdoc::trackerdoc::NvDsTargetMiscDataStreamDoc::list);
 
-  py::class_<NvDsPastFrameObjBatch> (
-      m, "NvDsPastFrameObjBatch",
-      pydsdoc::trackerdoc::NvDsPastFrameObjBatchDoc::descr)
+  py::class_<NvDsTargetMiscDataBatch> (
+      m, "NvDsTargetMiscDataBatch",
+      pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::descr)
       .def (py::init<> ())
-      .def_readwrite ("numAllocated", &NvDsPastFrameObjBatch::numAllocated)
-      .def_readwrite ("numFilled", &NvDsPastFrameObjBatch::numFilled)
+      .def_readwrite ("numAllocated", &NvDsTargetMiscDataBatch::numAllocated)
+      .def_readwrite ("numFilled", &NvDsTargetMiscDataBatch::numFilled)
 
       .def (
-          "cast", [] (void *data) { return (NvDsPastFrameObjBatch *)data; },
+          "cast", [] (void *data) { return (NvDsTargetMiscDataBatch *)data; },
           py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjBatchDoc::cast)
+          pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::cast)
 
       .def (
           "list",
-          [] (NvDsPastFrameObjBatch &self) {
+          [] (NvDsTargetMiscDataBatch &self) {
             return py::make_iterator (self.list, self.list + self.numFilled);
           },
           py::keep_alive<0, 1> (), py::return_value_policy::reference,
-          pydsdoc::trackerdoc::NvDsPastFrameObjBatchDoc::list);
-
-  m.attr ("UNTRACKED_OBJECT_ID") = py::cast (UNTRACKED_OBJECT_ID);
+          pydsdoc::trackerdoc::NvDsTargetMiscDataBatchDoc::list);
+   m.attr ("UNTRACKED_OBJECT_ID") = py::cast (UNTRACKED_OBJECT_ID);
 }
 
 }

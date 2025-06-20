@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2020-2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2020-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@ import time
 import sys
 import math
 import platform
-from common.is_aarch_64 import is_aarch64
+from common.platform_info import PlatformInfo
 from common.bus_call import bus_call
 from common.FPS import PERF_DATA
 
@@ -43,7 +43,7 @@ PGIE_CLASS_ID_PERSON = 2
 PGIE_CLASS_ID_ROADSIGN = 3
 MUXER_OUTPUT_WIDTH=1920
 MUXER_OUTPUT_HEIGHT=1080
-MUXER_BATCH_TIMEOUT_USEC=4000000
+MUXER_BATCH_TIMEOUT_USEC = 33000
 TILED_OUTPUT_WIDTH=1280
 TILED_OUTPUT_HEIGHT=720
 GST_CAPS_FEATURES_NVMM="memory:NVMM"
@@ -227,6 +227,7 @@ def main(args):
     perf_data = PERF_DATA(len(args) - 1)
     number_sources=len(args)-1
 
+    platform_info = PlatformInfo()
     # Standard GStreamer initialization
     Gst.init(None)
 
@@ -256,7 +257,7 @@ def main(args):
             sys.stderr.write("Unable to create source bin \n")
         pipeline.add(source_bin)
         padname="sink_%u" %i
-        sinkpad= streammux.get_request_pad(padname) 
+        sinkpad= streammux.request_pad_simple(padname) 
         if not sinkpad:
             sys.stderr.write("Unable to create sink pad bin \n")
         srcpad=source_bin.get_static_pad("src")
@@ -311,14 +312,18 @@ def main(args):
     nvosd.set_property('process-mode',OSD_PROCESS_MODE)
     nvosd.set_property('display-text',OSD_DISPLAY_TEXT)
 
-    if is_aarch64():
+    if platform_info.is_integrated_gpu():
         print("Creating nv3dsink \n")
         sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
         if not sink:
             sys.stderr.write(" Unable to create nv3dsink \n")
     else:
-        print("Creating EGLSink \n")
-        sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
+        if platform_info.is_platform_aarch64():
+            print("Creating nv3dsink \n")
+            sink = Gst.ElementFactory.make("nv3dsink", "nv3d-sink")
+        else:
+            print("Creating EGLSink \n")
+            sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
         if not sink:
             sys.stderr.write(" Unable to create egl sink \n")
 
@@ -329,7 +334,7 @@ def main(args):
     streammux.set_property('width', 1920)
     streammux.set_property('height', 1080)
     streammux.set_property('batch-size', number_sources)
-    streammux.set_property('batched-push-timeout', 4000000)
+    streammux.set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT_USEC)
     pgie.set_property('config-file-path', "dsnvanalytics_pgie_config.txt")
     pgie_batch_size=pgie.get_property("batch-size")
     if(pgie_batch_size != number_sources):

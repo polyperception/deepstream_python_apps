@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ################################################################################
-# SPDX-FileCopyrightText: Copyright (c) 2020-2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2020-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,6 @@ sys.path.append("../")
 import gi
 gi.require_version("Gst", "1.0")
 from gi.repository import GLib, Gst
-from common.is_aarch_64 import is_aarch64
 from common.bus_call import bus_call
 from ssd_parser import nvds_infer_parse_custom_tf_ssd, DetectionParam, NmsParam, BoxSizeParam
 import pyds
@@ -43,7 +42,7 @@ MIN_BOX_HEIGHT = 32
 TOP_K = 20
 IOU_THRESHOLD = 0.3
 OUTPUT_VIDEO_NAME = "./out.mp4"
-
+MUXER_BATCH_TIMEOUT_USEC = 33000
 
 def get_label_names_from_file(filepath):
     """ Read a label file and convert it to string list """
@@ -373,7 +372,7 @@ def main(args):
     streammux.set_property("width", IMAGE_WIDTH)
     streammux.set_property("height", IMAGE_HEIGHT)
     streammux.set_property("batch-size", 1)
-    streammux.set_property("batched-push-timeout", 4000000)
+    streammux.set_property("batched-push-timeout", MUXER_BATCH_TIMEOUT_USEC)
     pgie.set_property("config-file-path", "dstest_ssd_nopostprocess.txt")
 
     print("Adding elements to Pipeline \n")
@@ -399,7 +398,7 @@ def main(args):
     source.link(h264parser)
     h264parser.link(decoder)
 
-    sinkpad = streammux.get_request_pad("sink_0")
+    sinkpad = streammux.request_pad_simple("sink_0")
     if not sinkpad:
         sys.stderr.write(" Unable to get the sink pad of streammux \n")
     srcpad = decoder.get_static_pad("src")

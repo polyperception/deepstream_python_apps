@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,32 +22,28 @@ import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst
 
-from tests.common.generic_pipeline import GenericPipeline
+from tests.testcommon.generic_pipeline import GenericPipeline
 
 
-class PipelineFileSink(GenericPipeline):
+class PipelineFakesinkTracker(GenericPipeline):
 
-    def __init__(self, properties, is_aarch64):
+    def __init__(self, properties, is_integrated_gpu):
         pipeline_base = [
             ["filesrc", "file-source"],  # source
             ["h264parse", "h264-parser"],  # h264parser
             ["nvv4l2decoder", "nvv4l2-decoder"],  # decoder
             ["nvstreammux", "Stream-muxer"],  # streammux
             ["nvinfer", "primary-inference"],  # pgie
+            ["nvtracker", "tracker"],  # tracker
+            ["nvinfer", "secondary1-nvinference-engine"],  # sgie1
+            ["nvinfer", "secondary2-nvinference-engine"],  # sgie2
             ["nvvideoconvert", "convertor"],  # nvvidconv
             ["nvdsosd", "onscreendisplay"],  # nvosd
-            ["queue", "queue"],  # queue
-            ["nvvideoconvert", "convertor2"],  # nvvidconv2
-            ["capsfilter", "capsfilter"],  # capsfilter
-            ["avenc_mpeg4", "encoder"],  # encoder
-            ["mpeg4videoparse", "mpeg4-parser"],  # codeparser
-            ["qtmux", "qtmux"],  # container
-            ["filesink", "filesink"],  # sink
+            ["fakesink", "fakesink"],  # sink
         ]
         pipeline_arm64 = [
-            ["nvegltransform", "nvegl-transform"]  # transform
         ]
-        super().__init__(properties, is_aarch64, pipeline_base,
+        super().__init__(properties, is_integrated_gpu, pipeline_base,
                          pipeline_arm64)
 
     def set_probe(self, probe_function):
@@ -65,15 +61,12 @@ class PipelineFileSink(GenericPipeline):
         decoder = gebn("nvv4l2-decoder")
         streammux = gebn("Stream-muxer")
         pgie = gebn("primary-inference")
+        tracker = gebn("tracker")
+        sgie1 = gebn("secondary1-nvinference-engine")
+        sgie2 = gebn("secondary2-nvinference-engine")
         nvvidconv = gebn("convertor")
         nvosd = gebn("onscreendisplay")
-        queue = gebn("queue")
-        nvvidconv2 = gebn("convertor2")
-        capsfilter = gebn("capsfilter")
-        encoder = gebn("encoder")
-        codeparser = gebn("mpeg4-parser")
-        container = gebn("qtmux")
-        sink = gebn("filesink")
+        sink = gebn("fakesink")
 
         source.link(h264parser)
         h264parser.link(decoder)
@@ -83,29 +76,17 @@ class PipelineFileSink(GenericPipeline):
             sys.stderr.write(" Unable to get source pad of decoder \n")
             return False
 
-        sinkpad = streammux.get_request_pad("sink_0")
+        sinkpad = streammux.request_pad_simple("sink_0")
         if not sinkpad:
             sys.stderr.write(" Unable to get the sink pad of streammux \n")
             return False
 
-        caps = Gst.Caps.from_string("video/x-raw, format=I420")
-        capsfilter.set_property("caps", caps)
-
         srcpad.link(sinkpad)
         streammux.link(pgie)
-        pgie.link(nvvidconv)
+        pgie.link(tracker)
+        tracker.link(sgie1)
+        sgie1.link(sgie2)
+        sgie2.link(nvvidconv)
         nvvidconv.link(nvosd)
-        nvosd.link(queue)
-        queue.link(nvvidconv2)
-        nvvidconv2.link(capsfilter)
-        capsfilter.link(encoder)
-        encoder.link(codeparser)
-        codeparser.link(container)
-        container.link(sink)
-        if self._is_aarch64:
-            transform = gebn("nvegl-transform")
-            nvosd.link(transform)
-            transform.link(sink)
-        else:
-            nvosd.link(sink)
+        nvosd.link(sink)
         return True

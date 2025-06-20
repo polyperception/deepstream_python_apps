@@ -22,12 +22,12 @@ import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst
 
-from tests.common.generic_pipeline import GenericPipeline
+from tests.testcommon.generic_pipeline import GenericPipeline
 
 
-class PipelineFakesink(GenericPipeline):
+class PipelineNveglgleSink(GenericPipeline):
 
-    def __init__(self, properties, is_aarch64):
+    def __init__(self, properties, is_integrated_gpu):
         pipeline_base = [
             ["filesrc", "file-source"],  # source
             ["h264parse", "h264-parser"],  # h264parser
@@ -36,11 +36,12 @@ class PipelineFakesink(GenericPipeline):
             ["nvinfer", "primary-inference"],  # pgie
             ["nvvideoconvert", "convertor"],  # nvvidconv
             ["nvdsosd", "onscreendisplay"],  # nvosd
-            ["fakesink", "fakesink"],  # sink
+            ["nveglglessink", "nvvideo-renderer"],  # sink
         ]
         pipeline_arm64 = [
+            ["nvegltransform", "nvegl-transform"]  # transform
         ]
-        super().__init__(properties, is_aarch64, pipeline_base,
+        super().__init__(properties, is_integrated_gpu, pipeline_base,
                          pipeline_arm64)
 
     def set_probe(self, probe_function):
@@ -60,7 +61,7 @@ class PipelineFakesink(GenericPipeline):
         pgie = gebn("primary-inference")
         nvvidconv = gebn("convertor")
         nvosd = gebn("onscreendisplay")
-        sink = gebn("fakesink")
+        sink = gebn("nvvideo-renderer")
 
         source.link(h264parser)
         h264parser.link(decoder)
@@ -70,7 +71,7 @@ class PipelineFakesink(GenericPipeline):
             sys.stderr.write(" Unable to get source pad of decoder \n")
             return False
 
-        sinkpad = streammux.get_request_pad("sink_0")
+        sinkpad = streammux.request_pad_simple("sink_0")
         if not sinkpad:
             sys.stderr.write(" Unable to get the sink pad of streammux \n")
             return False
@@ -79,5 +80,10 @@ class PipelineFakesink(GenericPipeline):
         streammux.link(pgie)
         pgie.link(nvvidconv)
         nvvidconv.link(nvosd)
-        nvosd.link(sink)
+        if self._is_integrated_gpu:
+            transform = gebn("nvegl-transform")
+            nvosd.link(transform)
+            transform.link(sink)
+        else:
+            nvosd.link(sink)
         return True

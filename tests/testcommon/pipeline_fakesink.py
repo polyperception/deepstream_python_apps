@@ -22,29 +22,25 @@ import gi
 gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst
 
-from tests.common.generic_pipeline import GenericPipeline
+from tests.testcommon.generic_pipeline import GenericPipeline
 
 
-class PipelineFakesinkTracker(GenericPipeline):
+class PipelineFakesink(GenericPipeline):
 
-    def __init__(self, properties, is_aarch64):
+    def __init__(self, properties, is_integrated_gpu):
         pipeline_base = [
             ["filesrc", "file-source"],  # source
             ["h264parse", "h264-parser"],  # h264parser
             ["nvv4l2decoder", "nvv4l2-decoder"],  # decoder
             ["nvstreammux", "Stream-muxer"],  # streammux
             ["nvinfer", "primary-inference"],  # pgie
-            ["nvtracker", "tracker"],  # tracker
-            ["nvinfer", "secondary1-nvinference-engine"],  # sgie1
-            ["nvinfer", "secondary2-nvinference-engine"],  # sgie2
-            ["nvinfer", "secondary3-nvinference-engine"],  # sgie3
             ["nvvideoconvert", "convertor"],  # nvvidconv
             ["nvdsosd", "onscreendisplay"],  # nvosd
             ["fakesink", "fakesink"],  # sink
         ]
         pipeline_arm64 = [
         ]
-        super().__init__(properties, is_aarch64, pipeline_base,
+        super().__init__(properties, is_integrated_gpu, pipeline_base,
                          pipeline_arm64)
 
     def set_probe(self, probe_function):
@@ -62,10 +58,6 @@ class PipelineFakesinkTracker(GenericPipeline):
         decoder = gebn("nvv4l2-decoder")
         streammux = gebn("Stream-muxer")
         pgie = gebn("primary-inference")
-        tracker = gebn("tracker")
-        sgie1 = gebn("secondary1-nvinference-engine")
-        sgie2 = gebn("secondary2-nvinference-engine")
-        sgie3 = gebn("secondary3-nvinference-engine")
         nvvidconv = gebn("convertor")
         nvosd = gebn("onscreendisplay")
         sink = gebn("fakesink")
@@ -78,18 +70,14 @@ class PipelineFakesinkTracker(GenericPipeline):
             sys.stderr.write(" Unable to get source pad of decoder \n")
             return False
 
-        sinkpad = streammux.get_request_pad("sink_0")
+        sinkpad = streammux.request_pad_simple("sink_0")
         if not sinkpad:
             sys.stderr.write(" Unable to get the sink pad of streammux \n")
             return False
 
         srcpad.link(sinkpad)
         streammux.link(pgie)
-        pgie.link(tracker)
-        tracker.link(sgie1)
-        sgie1.link(sgie2)
-        sgie2.link(sgie3)
-        sgie3.link(nvvidconv)
+        pgie.link(nvvidconv)
         nvvidconv.link(nvosd)
         nvosd.link(sink)
         return True
