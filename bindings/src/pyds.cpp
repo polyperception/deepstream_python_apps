@@ -16,6 +16,7 @@ AFFILIATES. All rights reserved.
  * limitations under the License.
  */
 
+#include "pyds.hpp"
 #include "bind_embed_metadata.hpp"
 #include "bind_label.hpp"
 #include "bind_reidembed_metadata.hpp"
@@ -31,8 +32,7 @@ AFFILIATES. All rights reserved.
 #include "bindopticalflow.hpp"
 #include "bindschema.hpp"
 #include "bindtrackermeta.hpp"
-
-#include "pyds.hpp"
+#include "custom_binding/include/bindcustom.hpp"
 
 /*#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
