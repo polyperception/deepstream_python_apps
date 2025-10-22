@@ -15,8 +15,9 @@ bindinstancesegmentation (py::module &m)
       .def (py::init<> ())
       // binding embedding int with InstanceSegmentationMetadata vector
       .def_readwrite ("polygon", &InstanceSegmentationMetadata::polygon)
-      .def_readwrite ("area", &InstanceSegmentationMetadata::class_ids)
-      // binding function to cast user_meta_data to ReIDEmbeddingMetadata
+      .def_readwrite ("area", &InstanceSegmentationMetadata::area)
+      // binding function to cast user_meta_data to
+      // InstanceSegmentationMetadata
       .def (
           "cast",
           [] (void *data) { return (InstanceSegmentationMetadata *)data; },
