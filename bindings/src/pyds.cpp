@@ -18,6 +18,7 @@ AFFILIATES. All rights reserved.
 
 #include "pyds.hpp"
 #include "bind_embed_metadata.hpp"
+#include "bind_instance_segmentation.hpp"
 #include "bind_label.hpp"
 #include "bind_reidembed_metadata.hpp"
 #include "bind_tracker_status_metadata.hpp"
@@ -75,6 +76,7 @@ PYBIND11_MODULE (pyds, m)
   bindembedding (m);
   bindlabel (m);
   bindtrackerstatus (m);
+  bindinstancesegmentation (m);
 
 } // end PYBIND11_MODULE(pyds, m)
 }
