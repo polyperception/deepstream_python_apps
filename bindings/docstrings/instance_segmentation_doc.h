@@ -19,17 +19,19 @@
 
 namespace pydsdoc
 {
-namespace label
+namespace instancesegmentation
 {
-namespace LabelsMetadata
+namespace InstanceSegmentationMetadata
 {
 constexpr const char *descr = R"pyds(
-                  Holds full label information for a specific category
-  
-                  :ivar embedding: *vector<int>*, embeddings)pyds";
+                 Holds polygon and area information of the instance segmentation. 
+                 Polygon is normalized values to the entier image.
+ 
+                 :ivar polygon: *vector<int>*, normalized polygon values)pyds)
+                 :ivar area: *vector<int>*, area values)pyds";
 
 constexpr const char *cast
-    = R"pyds(cast given object/data to :class:`EmbeddingMetadata`, call pyds.EmbeddingMetadata.cast(data))pyds";
+    = R"pyds(cast given object/data to :class:`InstanceSegmentationMetadata`, call pyds.InstanceSegmentationMetadata.cast(data))pyds";
 }
 }
 }
