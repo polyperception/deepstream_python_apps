@@ -34,6 +34,7 @@ AFFILIATES. All rights reserved.
 #include "bindschema.hpp"
 #include "bindtrackermeta.hpp"
 #include "custom_binding/include/bindcustom.hpp"
+#include "bind_occupancy.hpp"
 
 /*#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
@@ -77,6 +78,6 @@ PYBIND11_MODULE (pyds, m)
   bindlabel (m);
   bindtrackerstatus (m);
   bindinstancesegmentation (m);
-
+  bindoccupancy (m);
 } // end PYBIND11_MODULE(pyds, m)
 }

@@ -622,6 +622,11 @@ constexpr const char *alloc_instance_segmentation_struct = R"pyds(
 
             :returns: Allocated :class:`InstanceSegmentationMetadata`)pyds";
 
+constexpr const char *alloc_occupancy_struct = R"pyds(
+            Allocate an :class:`OccupancyMetadata`.
+
+            :returns: Allocated :class:`OccupancyMetadata`)pyds";
+
 constexpr const char *alloc_reidembedding_struct = R"pyds(
             Allocate an :class:`ReIDEmbeddingMetadata`.
 
