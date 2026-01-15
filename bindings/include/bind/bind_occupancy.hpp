@@ -1,5 +1,5 @@
 #include "../../docstrings/functionsdoc.h"
-#include "../../docstrings/occupancy_doc.h"
+#include "../../docstrings/occupancydoc.h"
 #include "occupancy.h" // Include the actual C++ header file for OccupancyMetadata
 #include "pyds.hpp"
 
