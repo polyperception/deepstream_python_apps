@@ -13,7 +13,7 @@ bindoccupancy (py::module &m)
       m, "OccupancyMetadata",
       pydsdoc::occupancy::OccupancyMetadata::descr)
       .def (py::init<> ())
-      .def_readwrite ("occupancy", &OccupancyMetadata::occupancy)
+      .def_readwrite ("percent_occupancy", &OccupancyMetadata::percent_occupancy)
       .def (
           "cast",
           [] (void *data) { return (OccupancyMetadata *)data; },
